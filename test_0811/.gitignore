@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+
+# 量化产物（6.8GB，可随时用 save_awq_model.py 重新生成）
+awq/out/

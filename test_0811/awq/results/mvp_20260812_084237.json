@@ -1,0 +1,17 @@
+{
+  "model": "/data/models/Qwen3-VL-8B-Instruct",
+  "device": "npu:0",
+  "group_size": 128,
+  "num_bits": 4,
+  "timestamp": "20260812_084237",
+  "per_layer": {},
+  "summary": {
+    "n_layers_quantized": 0,
+    "improve_mean_pct": null,
+    "improve_min_pct": null
+  },
+  "e2e": {
+    "logits_cosine": 1.0000001192092896,
+    "logits_rel_fro": 0.0
+  }
+}
