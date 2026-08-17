@@ -1,0 +1,13 @@
+diff --git a/python/infinilm/modeling_utils.py b/python/infinilm/modeling_utils.py
+index 90b19da..d761f67 100644
+--- a/python/infinilm/modeling_utils.py
++++ b/python/infinilm/modeling_utils.py
+@@ -741,6 +741,8 @@ def _remap_deepseek_v4(state_dict, config=None):
+     """Remap DeepSeek V4 checkpoint names to InfiniLM generic linear names."""
+     remapped = {}
+     for key, tensor in state_dict.items():
++        if _should_skip_weight(key):
++            continue
+         if ".attn.wo_a." in key and key.endswith(".scale"):
+             continue
+         new_key = key

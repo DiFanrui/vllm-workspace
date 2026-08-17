@@ -1,0 +1,67 @@
+diff --git a/csrc/models/deepseek_v4/deepseek_v4_moe.cpp b/csrc/models/deepseek_v4/deepseek_v4_moe.cpp
+index 6319cb2..06bfb1c 100644
+--- a/csrc/models/deepseek_v4/deepseek_v4_moe.cpp
++++ b/csrc/models/deepseek_v4/deepseek_v4_moe.cpp
+@@ -7,6 +7,7 @@
+ #include "infinicore/context/context.hpp"
+ #include "infinicore/ops.hpp"
+ #include "infinicore/ops/deepseek_v4_router.hpp"
++#include "infinicore/ops/mul_scalar.hpp"
+ #include "infinicore/ops/distributed/allreduce.hpp"
+ #include "infinicore/ops/linear.hpp"
+ 
+@@ -81,11 +82,15 @@ DeepseekV4TopK::forward(const infinicore::Tensor &hidden_states) const {
+ 
+     auto gate_logits = infinicore::op::linear(hidden_states, weight_, std::nullopt, 1.0f);
+ 
+-    return infinicore::op::deepseek_v4_topk_router(gate_logits,
+-                                                   num_experts_per_tok_,
+-                                                   norm_topk_prob_,
+-                                                   router_bias);
++    auto [topk_weights, topk_indices] = infinicore::op::deepseek_v4_topk_router(
++        gate_logits,
++        num_experts_per_tok_,
++        norm_topk_prob_,
++        router_bias);
++    if (routed_scaling_ != 1.0f) {
++        topk_weights = infinicore::op::mul_scalar(topk_weights, routed_scaling_);
++    }
++    return {topk_weights, topk_indices};
+ }
+ 
+ DeepseekV4HashTopK::DeepseekV4HashTopK(std::shared_ptr<infinilm::config::ModelConfig> model_config,
+@@ -124,10 +129,16 @@ DeepseekV4HashTopK::forward(const infinicore::Tensor &hidden_states,
+     auto input_ids_view = input_ids->is_contiguous() ? input_ids : input_ids->contiguous();
+     if (!disable_fused_hash_topk_env()) {
+         try {
+-            return infinicore::op::deepseek_v4_hash_topk_router(
++            auto [topk_weights, topk_indices] = infinicore::op::deepseek_v4_hash_topk_router(
+                 hidden_states,
+                 weight_,
+                 input_ids_view,
+                 tid2eid_,
+                 norm_topk_prob_);
++            if (routed_scaling_ != 1.0f) {
++                topk_weights = infinicore::op::mul_scalar(topk_weights, routed_scaling_);
++            }
++            return {topk_weights, topk_indices};
+         } catch (const std::exception &e) {
+             spdlog::warn("DeepseekV4HashTopK: fused hash topk unavailable, falling back to linear + hash router: {}", e.what());
+         }
+@@ -135,12 +146,16 @@ DeepseekV4HashTopK::forward(const infinicore::Tensor &hidden_states,
+ 
+     auto gate_logits = infinicore::op::linear(hidden_states, weight_, std::nullopt, 1.0f);
+ 
+-    return infinicore::op::deepseek_v4_hash_router(
++    auto [topk_weights, topk_indices] = infinicore::op::deepseek_v4_hash_router(
+         gate_logits,
+         input_ids_view,
+         tid2eid_,
+         norm_topk_prob_);
++    if (routed_scaling_ != 1.0f) {
++        topk_weights = infinicore::op::mul_scalar(topk_weights, routed_scaling_);
++    }
++    return {topk_weights, topk_indices};
+ }
+ 
+ DeepseekV4Experts::DeepseekV4Experts(std::shared_ptr<infinilm::config::ModelConfig> model_config,

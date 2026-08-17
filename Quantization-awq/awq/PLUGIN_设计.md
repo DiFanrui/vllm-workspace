@@ -4,6 +4,7 @@
 > 先定位源码链路（vLLM 核心 + vllm-ascend 两层注册机制），再设计插件。
 
 ## 一句话
+
 vLLM 用 `--quantization <名字>` 找 QuantConfig；vllm-ascend 在 QuantConfig 的
 `get_quant_method()` 里，把每一层派发到「已注册的 scheme」。我们只要
 **注册一个新名字 + 注册一个 scheme + 写一个保存器**，就能让 vllm 加载我们的 AWQ 权重。
@@ -50,6 +51,7 @@ vLLM 用 `--quantization <名字>` 找 QuantConfig；vllm-ascend 在 QuantConfig
 - `--quantization awq_ascend` 显式指定即可（无需 config.json 探测）。
 
 ### 权重格式（每个量化模块存 3 个张量）
+
 对每个量化 Linear（权重 [out, in]，group_size=128，对称 INT4，范围 [-8,7]）：
 
 | 张量 | 形状 | 含义 |

@@ -1,0 +1,13 @@
+diff --git a/src/infiniop/devices/nvidia/nvidia_kernel_common.cuh b/src/infiniop/devices/nvidia/nvidia_kernel_common.cuh
+index 41f13f61..28ec12d0 100644
+--- a/src/infiniop/devices/nvidia/nvidia_kernel_common.cuh
++++ b/src/infiniop/devices/nvidia/nvidia_kernel_common.cuh
+@@ -71,7 +71,7 @@ exp_(const double val) {
+ 
+ __forceinline__ __device__ __half
+ exp_(const __half x) {
+-    return hexp(x);
++    return __float2half(expf(__half2float(x)));
+ }
+ 
+ __forceinline__ __device__ __nv_bfloat16

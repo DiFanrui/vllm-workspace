@@ -106,7 +106,7 @@ AWQ:        W → W·s → Q(W·s)   → 推理用 (x/s)·(W·s)，误差集中�
 
 ### 3.2 参考了什么（源码坐标）
 
-- AutoAWQ 官方实现：`test_0811/awq/refs/autoawq_scale.py`、`refs/autoawq_quantizer.py`
+- AutoAWQ 官方实现：`Workspace/awq/refs/autoawq_scale.py`、`refs/autoawq_quantizer.py`
   （从 AutoAWQ v0.2.9 拉的，作为算法正确性参照）。
 - 关键是对齐它们的**搜索方式**（见 3.5 的坑），不是抄。
 
@@ -114,8 +114,8 @@ AWQ:        W → W·s → Q(W·s)   → 推理用 (x/s)·(W·s)，误差集中�
 
 | 文件 | 作用 | 关键函数 |
 |---|---|---|
-| `test_0811/awq/awq_core.py`（307 行） | 算法核心，纯 torch | `int4_quant_scale` / `int4_quantize_round` / `int4_dequant` / `int4_reconstruct` / `awq_scale_search` / `awq_clip_search` / `awq_quantize` / `collect_calib_activations` |
-| `test_0811/awq/run_awq_mvp.py`（208 行） | MVP 驱动 | 5 步流程 + `LINEAR_SUFFIXES` 层匹配 + `apply_quantized_weights` 换回 w_hat 做 e2e |
+| `Workspace/awq/awq_core.py`（307 行） | 算法核心，纯 torch | `int4_quant_scale` / `int4_quantize_round` / `int4_dequant` / `int4_reconstruct` / `awq_scale_search` / `awq_clip_search` / `awq_quantize` / `collect_calib_activations` |
+| `Workspace/awq/run_awq_mvp.py`（208 行） | MVP 驱动 | 5 步流程 + `LINEAR_SUFFIXES` 层匹配 + `apply_quantized_weights` 换回 w_hat 做 e2e |
 
 核心算法流程（awq_core.py）：
 ```python

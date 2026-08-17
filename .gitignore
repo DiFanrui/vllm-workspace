@@ -1,6 +1,35 @@
 # 大型推理产物目录（约 7.2GB，排除）
 /out/
 
-# 根级通用忽略
+# Infini-dpsk 下的临时克隆 / CI 工作区（含嵌套 .git，不属源码）
+/Infini-dpsk/_tmp_*/
+
+# ---------------------------------------------------------------------------
+# 根级通用忽略（各子项目仍可带自己的 .gitignore，嵌套规则同样生效）
+# ---------------------------------------------------------------------------
+# Python 缓存
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+
+# 虚拟环境 / 构建产物
+.venv/
+venv/
+env/
+*.egg-info/
+build/
+dist/
+
+# 编辑器 / 系统
+.vscode/
+.idea/
 .DS_Store
 Thumbs.db
+
+# 临时文件
+*.log
+*.tmp
